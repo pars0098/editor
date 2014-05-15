@@ -87,12 +87,32 @@ void document::parseInput(string s)
 		}
 
 		if(c=="d") {
-			if(pointChar >= line[pointLine].length()) {
-				line[pointLine]+=line[pointLine+1];
-				line.erase(line.begin()+pointLine+1);
-			}
-			else {
-				line[pointLine].erase(pointChar, 1);
+
+			//make sure there are some lines to work with, otherwise do nothing
+			//check if the current line point is not at the end
+			if(line.size() > 0 && pointLine < line.size()) {
+				
+				//check if the current character point is at the end of the line
+				if(pointChar >= line[pointLine].length()) {
+
+					//check there another line below the current
+					if((pointLine + 1) < line.size()) {
+
+						//append the string from the next line to the current line
+						line[pointLine]+=line[pointLine+1];
+
+						//erase the next line
+						line.erase(line.begin()+pointLine+1);
+					}
+					else
+					{
+						line.erase(line.begin()+pointLine);
+					}
+				}
+				else {
+					line[pointLine].erase(pointChar, 1);
+				}
+
 			}
 		}
 
@@ -153,6 +173,10 @@ int document::insertString(int atLine, int atChar, string s) {
 
 void document::splitLine(int atLine, int atChar) {
 
+	if (atLine >= line.size()) {
+		atLine = line.size()-1;
+		atChar = line[atLine].length();
+	}
 	string s = line[atLine].substr(atChar, s.length()-atChar);
 	line[atLine] = line[atLine].substr(0, atChar);
 	addLine(atLine+1, s);
@@ -175,8 +199,7 @@ string document::debugString()
 	//string s;
 	ostringstream s;
 
-	s << "pointLine=" << (pointLine) << ";";
-	s << "pointChar=" << (pointChar) << "\n";
+	s << "pointLine=" << (pointLine) << ";" << "pointChar=" << (pointChar) << "line.size()=" << line.size() << "\n";
 	s << "----------------------------------------------\n";
 	for (vector<string>::iterator it = line.begin() ; it != line.end(); ++it){
 		s << *it;

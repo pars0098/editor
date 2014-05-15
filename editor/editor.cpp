@@ -31,6 +31,8 @@ int main(int argc, char* argv[])
 	else {
 		//Debugging code
 		//Allows commands to be inputed one at a time, and verbose output produced with each command
+		cout << d.debugString();
+
 		while (cin){
 			getline(cin, s);
 			d.parseInput(s);
