@@ -9,8 +9,10 @@ class document
 public:
 	document(void);
 	void parseInput(string s);
-	void addLine(string s);
+	int addLine(int atLine, string s);
 	void removeLine();
+	int insertString(int atLine, int atChar, string s);
+	void splitLine(int atLine, int atChar);
 	string toString();
 	string debugString();
 

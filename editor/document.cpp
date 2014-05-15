@@ -27,7 +27,7 @@ void document::parseInput(string s)
 
 		//check whether the command was an insert only
 		if(c==".") {
-			addLine(s);
+			pointLine = addLine(pointLine, s);
 		}
 
 		if(c=="<") {
@@ -98,36 +98,40 @@ void document::parseInput(string s)
 
 		if(c=="i") {
 			s.erase(0,1);
-
 			string t = s;
-			//check for the presence of new line
-			while (int p=t.find("\n")) {
+
+			size_t p;
+			while((p = t.find("\\n",0)) < t.length()) {
 				string x = t.substr(0, p);
+				pointChar = insertString(pointLine, pointChar, x);
+				splitLine(pointLine, pointChar);
+				pointLine++;
+				pointChar=0;
+				t.erase(0, p + 2);
 			}
-	
-			if(line.size()==0) { line.push_back(""); }
-			line[pointLine].insert(pointChar, s);
-			pointChar+=s.length();
+
+			pointChar = insertString(pointLine, pointChar, t);
 		}
 
 	}
 	//Otherwise just insert the string into the document
 	else
 	{
-		addLine(s);
+		pointLine = addLine(pointLine, s);
 	}
 
 }
 
-void document::addLine(string s)
+int document::addLine(int atLine, string s)
 {
-	if (pointLine <= line.size()) {
-		line.insert(line.begin()+pointLine, s);
-		pointLine++;
+	if (atLine <= line.size()) {
+		line.insert(line.begin()+atLine, s);
+		return atLine+1;
 	}
 	else
 	{
 		line.push_back(s);
+		return line.size();
 	}
 }
 
@@ -138,6 +142,22 @@ void document::removeLine()
 	}
 }
 
+int document::insertString(int atLine, int atChar, string s) {
+
+	if(line.size()==0) { line.push_back(""); }
+	if (atLine >= line.size()) { atLine = line.size()-1; }
+	line[atLine].insert(atChar, s);
+	atChar += s.length();
+	return atChar;
+}
+
+void document::splitLine(int atLine, int atChar) {
+
+	string s = line[atLine].substr(atChar, s.length()-atChar);
+	line[atLine] = line[atLine].substr(0, atChar);
+	addLine(atLine+1, s);
+
+}
 
 string document::toString()
 {
