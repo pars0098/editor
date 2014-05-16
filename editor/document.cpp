@@ -88,6 +88,15 @@ void document::parseInput(string s)
 
 		if(c=="d") {
 
+
+			//if(pointChar >= line[pointLine].length()) {
+			//	line[pointLine]+=line[pointLine+1];
+			//	line.erase(line.begin()+pointLine+1);
+			//}
+			//else {
+			//	line[pointLine].erase(pointChar, 1);
+			//}
+
 			//make sure there are some lines to work with, otherwise do nothing
 			//check if the current line point is not at the end
 			if(line.size() > 0 && pointLine < line.size()) {
@@ -118,19 +127,37 @@ void document::parseInput(string s)
 
 		if(c=="i") {
 			s.erase(0,1);
+
+			//store the current input into a temporary string
 			string t = s;
 
+			//check for the presence of a newline character and loop through until there are no more left
 			size_t p;
 			while((p = t.find("\\n",0)) < t.length()) {
+
+				//find the string that exists just before the newline character
 				string x = t.substr(0, p);
-				pointChar = insertString(pointLine, pointChar, x);
+
+				//check there is a string to insert, and if there is then insert it
+				if (x.length() > 0) {
+					pointChar = insertString(pointLine, pointChar, x);
+				}
+
+				//split the line at the point where the newline character appears
 				splitLine(pointLine, pointChar);
+
+				//move to the next line
 				pointLine++;
 				pointChar=0;
+
+				//erase the portion of the string up to and including the newline
 				t.erase(0, p + 2);
 			}
 
-			pointChar = insertString(pointLine, pointChar, t);
+			//if there is anything left over after the last newline character, or there was no newline character, then insert that string
+			if (t.length() > 0) {
+				pointChar = insertString(pointLine, pointChar, t);
+			}
 		}
 
 	}
@@ -164,22 +191,35 @@ void document::removeLine()
 
 int document::insertString(int atLine, int atChar, string s) {
 
+	//if line is currently empty then add a new item
 	if(line.size()==0) { line.push_back(""); }
+
+	//if atLine is outside of the bounds then move it to the last entry
 	if (atLine >= line.size()) { atLine = line.size()-1; }
+
+	//insert the string
 	line[atLine].insert(atChar, s);
+
+	//move the character point to the end of the new string
 	atChar += s.length();
+
 	return atChar;
 }
 
 void document::splitLine(int atLine, int atChar) {
 
-	if (atLine >= line.size()) {
-		atLine = line.size()-1;
-		atChar = line[atLine].length();
+	if(line.size()==0) {
+			line.push_back("");
 	}
-	string s = line[atLine].substr(atChar, s.length()-atChar);
-	line[atLine] = line[atLine].substr(0, atChar);
-	addLine(atLine+1, s);
+	else {
+		if (atLine >= line.size()) {
+			atLine = line.size()-1;
+			atChar = line[atLine].length();
+		}
+		string s = line[atLine].substr(atChar, s.length()-atChar);
+		line[atLine] = line[atLine].substr(0, atChar);
+		addLine(atLine+1, s);
+	}
 
 }
 
