@@ -22,7 +22,7 @@ void document::parseInput(string s)
 
 		//drop the dot
 		s.erase(0,1);
-		
+
 		string c = s.substr(0,1);
 
 		//check whether the command was an insert only
@@ -44,7 +44,7 @@ void document::parseInput(string s)
 			if(pointLine > 0) { pointLine--; }
 			pointChar = 0;
 		}
-		
+
 		if(c=="n") {
 			if(pointLine < line.size()) { pointLine++; }
 			pointChar = 0;
@@ -77,7 +77,7 @@ void document::parseInput(string s)
 			if(pointChar < 0) {
 				if(pointLine > 0) {
 					pointLine--;
-					pointChar=line[pointLine].length()-1;
+					pointChar=line[pointLine].length();
 				}
 				else
 				{
@@ -100,7 +100,7 @@ void document::parseInput(string s)
 			//make sure there are some lines to work with, otherwise do nothing
 			//check if the current line point is not at the end
 			if(line.size() > 0 && pointLine < line.size()) {
-				
+
 				//check if the current character point is at the end of the line
 				if(pointChar >= line[pointLine].length()) {
 
@@ -111,11 +111,11 @@ void document::parseInput(string s)
 						line[pointLine]+=line[pointLine+1];
 
 						//erase the next line
-						line.erase(line.begin()+pointLine+1);
+						vector<string>::iterator i = line.erase(line.begin()+pointLine+1);
 					}
 					else
 					{
-						line.erase(line.begin()+pointLine);
+						vector<string>::iterator i = line.erase(line.begin()+pointLine);
 					}
 				}
 				else {
@@ -133,12 +133,15 @@ void document::parseInput(string s)
 
 			t = s;
 
+
 			//check for the presence of a newline character and loop through until there are no more left
 			size_t p;
 			while((p = t.find("\\n",0)) < t.length()) {
 
 				//find the string that exists just before the newline character
-				string x = t.substr(0, p);
+				string x;
+
+				x = t.substr(0, p);
 
 				//check there is a string to insert, and if there is then insert it
 				if (x.length() > 0) {
@@ -174,7 +177,7 @@ void document::parseInput(string s)
 int document::addLine(int atLine, string s)
 {
 	if (atLine <= line.size()) {
-		line.insert(line.begin()+atLine, s);
+		vector<string>::iterator i = line.insert(line.begin()+atLine, s);
 		return atLine+1;
 	}
 	else
@@ -187,7 +190,7 @@ int document::addLine(int atLine, string s)
 void document::removeLine()
 {
 	if (pointLine < line.size()) {
-		line.erase(line.begin()+pointLine);
+		vector<string>::iterator i = line.erase(line.begin()+pointLine);
 	}
 }
 
@@ -218,9 +221,10 @@ void document::splitLine(int atLine, int atChar) {
 			atLine = line.size()-1;
 			atChar = line[atLine].length();
 		}
-		string s = line[atLine].substr(atChar, s.length()-atChar);
+		string s = line[atLine];
+		string t = s.substr(atChar, s.length()-atChar);
 		line[atLine] = line[atLine].substr(0, atChar);
-		addLine(atLine+1, s);
+		addLine(atLine+1, t);
 	}
 
 }
@@ -241,12 +245,14 @@ string document::debugString()
 	//string s;
 	ostringstream s;
 
-	s << "pointLine=" << (pointLine) << ";" << "pointChar=" << (pointChar) << "line.size()=" << line.size() << "\n";
-	s << "----------------------------------------------\n";
+	s << "\nOutput after command\n-------------------------------------------------------------------\n";
 	for (vector<string>::iterator it = line.begin() ; it != line.end(); ++it){
 		s << *it;
 		s << '\n';
 	}
-	s << "----------------------------------------------\n";
+	s << "-------------------------------------------------------------------\n";
+	s << "pointLine=" << (pointLine) << "; pointChar=" << (pointChar) << "; line.size()=" << line.size() << "\n";
+	s << "-------------------------------------------------------------------\n\nCommand > ";
+
 	return s.str();
 }
