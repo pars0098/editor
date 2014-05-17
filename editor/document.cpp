@@ -129,7 +129,9 @@ void document::parseInput(string s)
 			s.erase(0,1);
 
 			//store the current input into a temporary string
-			string t = s;
+			string t;
+
+			t = s;
 
 			//check for the presence of a newline character and loop through until there are no more left
 			size_t p;
