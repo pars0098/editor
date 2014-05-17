@@ -1,3 +1,8 @@
+//Flinders University CP2, Semester 1 2014 - Assignment 2 Core
+//Author: David Parsons
+//Student ID: pars0098
+//Email: pars0098@flinders.edu.au
+
 #include "editor.h"
 #include "document.h"
 
@@ -6,15 +11,26 @@
 
 using namespace std;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
+
+	//The document stores the complete document text
 	document d;
+
+	//A string to hold the current input
 	string s;
 
-	//debug mode will be switched on by the presence of any arguments
-	//not the most elegant but a quick and easy way to turn debug on while developing, but also allowing "try" to be run without needing to change code
+
+	//debug mode allows commands to be inputed one at a time and a verbose output produced with each command
 	bool debugMode = false;
-	if (argc > 1) { debugMode=true;	}
+
+	//debug mode will be switched on by the presence of the -d command line argument
+	if (argc > 1) {
+		for(int i=1; i < argc; i++) {
+			if (argv[i]="-d") {
+				debugMode=true;
+			}
+		}
+	}
 
 	if(!debugMode) {
 		//Start taking input one line at a time and processing it
@@ -24,13 +40,12 @@ int main(int argc, char* argv[])
 				//Line is good, send it to the document to be parsed
 				d.parseInput(s);
 			}
-			//Add error handling here if I get time
 		}
 		cout << d.toString();
 	}
 	else {
-		//Debugging code
-		//Allows commands to be inputed one at a time, and verbose output produced with each command
+		//Debugging mode
+		//Output the initial state
 		cout << d.debugString();
 
 		while (cin){
