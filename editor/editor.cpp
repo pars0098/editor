@@ -3,7 +3,6 @@
 //Student ID: pars0098
 //Email: pars0098@flinders.edu.au
 
-#include "editor.h"
 #include "document.h"
 
 #include <string>
