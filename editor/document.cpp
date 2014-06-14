@@ -26,7 +26,6 @@ document::document(void)
 //parseInput function decides what command(s) should be executed from the current line of input and executes the command(s)
 void document::parseInput(string s)
 {
-
 	//Checks to see whether the input is a command by looking for the preceding "."
 	//If no "." is found then the input string is just added to the document
 	if (s.substr(0,1)!=".")	{
@@ -100,9 +99,17 @@ void document::parseInput(string s)
 					pointChar = 0;
 				}
 
+				if(c=="y") {
+					if(buffer.size() > 0) { line.insert(line.begin()+pointLine, buffer.begin(), buffer.end()); pointLine+=buffer.size(); pointChar=0; }
+				}
+
 				//Command to remove entire line
 				if(c=="k") {
 					if(line.size() > 0) { removeLine(); }
+				}
+				else
+				{
+					buffer.empty();
 				}
 
 				//Command to move point to beginning of current line
@@ -244,6 +251,7 @@ int document::addLine(int atLine, string s)
 void document::removeLine()
 {
 	if (pointLine < line.size()) {
+		buffer.insert(buffer.end(),line[pointLine]);
 		vector<string>::iterator i = line.erase(line.begin()+pointLine);
 	}
 }

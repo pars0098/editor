@@ -188,10 +188,6 @@
 				RelativePath=".\document.h"
 				>
 			</File>
-			<File
-				RelativePath=".\editor.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

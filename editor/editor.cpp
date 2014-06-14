@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
 
 	//The document stores the complete document text
 	document d;
@@ -25,7 +25,8 @@ int main(int argc, char* argv[]) {
 	//debug mode will be switched on by the presence of the -d command line argument
 	if (argc > 1) {
 		for(int i=1; i < argc; i++) {
-			if (argv[i]="-d") {
+			string a = argv[i];
+			if (a=="-d") {
 				debugMode=true;
 			}
 		}
@@ -42,6 +43,7 @@ int main(int argc, char* argv[]) {
 		}
 		cout << d.toString();
 	}
+
 	else {
 		//Debugging mode
 		//Output the initial state
