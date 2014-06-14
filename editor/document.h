@@ -15,9 +15,7 @@ public:
 	void splitLine(int atLine, int atChar);
 	string toString();
 	string debugString();
-	bool search(string searchFor);
-	bool searchEndOfLine(string searchFor);
-	bool searchStartOfLine(string searchFor);
+	bool searchInLine(string searchFor, int atLine, int atChar, bool exactChar, bool wholeMatch);
 
 private:
 	int pointLine; //store the current point line number

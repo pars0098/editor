@@ -229,35 +229,156 @@ void document::parseInput(string s)
 			}
 
 			if (c=="s") {
-				size_t p;
 
-				bool f = false;
-				int firstFoundAtLine;
-				int firstFoundAtChar;
+				string d = this->toString();
 
-				if ((p = s.find("\\n",0)) < s.length()) {
-					string x;
-					x = s.substr(0, p);
-					f = searchEndOfLine(x);
-					s.erase(0, p + 2);
-					while (((p = s.find("\\n",0)) < s.length())&&f) {
-						string x;
-						x = s.substr(0, p);
-						f = searchEntireLine(x);
-						s.erase(0, p + 2);
-					}
-					if (f) {
-						string x;
-						x = s.substr(0, p);
-						f = searchStartOfLine(x);
-						s.erase(0, p + 2);
+				size_t newLine;
+				while ((newLine = s.find("\\n",0)) >= 0 && (newLine <= s.size())) {
+					s.erase(newLine, 2);
+					s.insert(newLine, "\n");
+				}
+
+				int atLine = 0;
+				int offset = 0;
+				while (atLine < pointLine) {
+					offset+=line[atLine].size()+1;
+					atLine++;
+				}
+
+				offset+=pointChar;
+
+				int p = d.find(s,offset);
+
+				if(p >= 0 && p < d.length()) {
+					int atLine = 0;
+					int t = 0;
+					while (atLine < line.size()) {
+						if ((t + line[atLine].size()+1) > p) {
+							pointChar = p - t;
+							pointLine = atLine;
+							break;
+						}
+						t = t + line[atLine].size()+1;
+						atLine++;
 					}
 				}
-				else if (s.length() > 0) {
-					search(s);
-					s.erase(0,s.length());
 
-				}
+				s.erase(0, s.length());
+
+			//	//rewrite to do search loop in here
+			//	//store search string and restart search from start of the string when it fails
+
+			//	string t = s;
+
+			//	int startLine = pointLine;
+			//	int startPoint = pointChar;
+
+			//	bool loop=false;
+
+			//	bool foundFirst=false;
+			//	bool hasNext = false;
+			//	bool foundNext=false;
+
+			//	int foundLine = pointLine;
+			//	int foundChar = pointChar;
+
+			//	size_t p;
+			//	while ((!loop&&pointLine<line.size())||(loop&&pointLine<=startLine)) {
+
+			//		int fromLine = startLine;
+			//		int fromChar = startChar;
+
+			//		while ((p = s.find("\\n",0)) >=0 || s.length() > 0) {
+			//			
+			//			string x;
+
+			//			if (p >= 0) {
+			//				x = s.substr(0, p);
+			//				s.erase(0, p + 2);
+			//				hasNext = true;
+			//			}
+			//			else
+			//			{
+			//				x = s;
+			//				s.erase(0, s.length());
+			//				hasNext = false;
+			//			}
+
+			//			if (!foundFirst) {
+
+			//				if (hasNext) {
+			//					foundFirst = searchInLine(x, pointLine, pointChar, true, false);
+			//				}
+			//				else
+			//				{
+			//					foundFirst = searchInLine(x, pointLine, pointChar, false, false);
+			//				}
+
+			//				if (foundFirst) {
+			//					foundLine = pointLine;
+			//					foundChar = pointChar;
+			//				}
+
+			//			}
+			//			else if (!foundNext) {
+			//				if (hasNext) {
+			//					foundNext = searchInLine(x, pointLine, 0, true, true);
+			//				}
+			//				else
+			//				{
+			//					foundNext = searchInLine(x, pointLine, 0, true, false);
+			//				}
+			//			}
+
+			//			if (foundFirst&&foundNext) {
+			//				pointLine = foundLine;
+			//				pointChar = foundChar;
+			//			}
+			//			else {
+			//				foundFirst=false;
+			//				foundNext=false;
+			//				foundLine = startLine;
+			//				foundChar = startChar;
+			//			}
+
+			//		}
+
+			//		pointLine++;
+			//		if (pointLine>=line.size()) {
+			//			pointLine=0;
+			//			pointChar=0;
+			//			loop=true;
+			//		}
+			//	}
+			//	
+
+			//	bool f = false;
+			//	int firstFoundAtLine;
+			//	int firstFoundAtChar;
+
+			//	if ((p = s.find("\\n",0)) < s.length()) {
+			//		string x;
+			//		x = s.substr(0, p);
+			//		f = searchEndOfLine(x);
+			//		s.erase(0, p + 2);
+			//		while (((p = s.find("\\n",0)) < s.length())&&f) {
+			//			string x;
+			//			x = s.substr(0, p);
+			//			f = searchEntireLine(x, pointLine);
+			//			s.erase(0, p + 2);
+			//		}
+			//		if (f) {
+			//			string x;
+			//			x = s.substr(0, p);
+			//			f = searchStartOfLine(x);
+			//			s.erase(0, p + 2);
+			//		}
+			//	}
+			//	else if (s.length() > 0) {
+			//		search(s);
+			//		s.erase(0,s.length());
+
+			//	}
 			}
 		}
 	}
@@ -324,99 +445,12 @@ void document::splitLine(int atLine, int atChar) {
 	}
 }
 
-bool document::search(string searchFor) {
-
-	//start from pointLine, pointChar and work forwards
-	while (pointLine<line.size()) {
-		int p = line[pointLine].find(searchFor, pointChar);
-		if (p >= pointChar) {
-			pointChar=p;
-			return true;
-		}
-		else
-		{
-			pointChar=0;
-			pointLine++;
-		}
-	}
-	
-	//loop back to the beginning of the document
-	pointLine=0;
-	pointChar=0;
-	while (pointLine<=startLine) {
-		int p = line[pointLine].find(searchFor, pointChar);
-		if ((pointLine!=startLine && p > pointChar) || (pointLine==startLine && p < startChar)) {
-			pointChar=p;
-			return true;
-		}
-		else
-		{
-			pointChar=0;
-			pointLine++;
-		}
-	}
-	return false;
+bool document::searchInLine(string searchFor, int atLine, int atChar, bool exactChar, bool wholeMatch) {
+	if (wholeMatch) { return line[atLine]==searchFor; }
+	int p = line[pointLine].find(searchFor, atChar);
+	return (exactChar&&p==atChar)||(!exactChar&&p>=atChar);
 }
 
-bool document::searchEndOfLine(string searchFor) {
-
-	int startLine = pointLine;
-	int startChar = pointChar;
-
-	//start from pointLine, pointChar and work forwards
-	while (pointLine<line.size()) {
-		int pointCharSearch = line[pointLine].length() - searchFor.length();
-		if (pointCharSearch > pointChar) {
-			int p = line[pointLine].find(searchFor, pointCharSearch);
-			if (p == pointCharSearch) {
-				pointChar=p;
-				return true;
-			}
-			else
-			{
-				pointChar=0;
-				pointLine++;
-			}
-		}
-	}
-	
-	//loop back to the beginning of the document
-	pointLine=0;
-	pointChar=0;
-	while (pointLine<=startLine) {
-		int pointCharSearch = line[pointLine].length() - searchFor.length();
-		if (pointCharSearch > pointChar) {
-			int p = line[pointLine].find(searchFor, pointCharSearch);
-			if (p == pointCharSearch) {
-				pointChar=p;
-				return true;
-			}
-			else
-			{
-				pointChar=0;
-				pointLine++;
-			}
-		}
-	}
-
-	return false;
-
-}
-
-bool document::searchStartOfLine(string searchFor) {
-
-	int p = line[pointLine].find(searchFor, 0);
-	if (p == 0) {
-		pointChar=p;
-		return true;
-	}
-	return false;
-
-}
-
-bool document::searchEntireLine(string searchFor) {
-	return line[pointLine]==searchFor;
-}
 //Return the entire document as a string
 string document::toString()
 {
