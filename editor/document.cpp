@@ -262,6 +262,23 @@ void document::parseInput(string s)
 						atLine++;
 					}
 				}
+				else
+				{
+					p = d.find(s, 0);
+					if(p >= 0 && p < d.length()) {
+						int atLine = 0;
+						int t = 0;
+						while (atLine < line.size()) {
+							if ((t + line[atLine].size()+1) > p) {
+								pointChar = p - t;
+								pointLine = atLine;
+								break;
+							}
+							t = t + line[atLine].size()+1;
+							atLine++;
+						}
+					}
+				}
 
 				s.erase(0, s.length());
 
