@@ -314,7 +314,7 @@ void document::search(string searchFor) {
 	//start from pointLine, pointChar and work forwards
 	while (pointLine<line.size()) {
 		int p = line[pointLine].find(searchFor, pointChar);
-		if (p > pointChar) {
+		if (p >= pointChar) {
 			pointChar=p;
 			return;
 		}
@@ -324,6 +324,28 @@ void document::search(string searchFor) {
 			pointLine++;
 		}
 	}
+	
+	//loop back to the beginning of the document
+	pointLine=0;
+	pointChar=0;
+	while (pointLine<=startLine) {
+		int p = line[pointLine].find(searchFor, pointChar);
+		if ((pointLine!=startLine && p > pointChar) || (pointLine==startLine && p < startChar)) {
+			pointChar=p;
+			return;
+		}
+		else
+		{
+			pointChar=0;
+			pointLine++;
+		}
+	}
+
+	//didn't find anything, go back to starting positions
+	pointChar = startChar;
+	pointLine = startLine;
+
+	return;
 
 }
 
