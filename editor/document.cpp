@@ -227,6 +227,20 @@ void document::parseInput(string s)
 					}
 				}
 			}
+
+			if (c=="s") {
+				size_t p;
+				if ((p = s.find("\\n",0)) < s.length()) {
+					string x;
+					x = s.substr(0, p);
+					s.erase(0, p + 2);
+				}
+				else
+				{
+					search(s);
+					s.erase(0,s.length());
+				}
+			}
 		}
 	}
 }
@@ -290,6 +304,27 @@ void document::splitLine(int atLine, int atChar) {
 		line[atLine] = line[atLine].substr(0, atChar);
 		addLine(atLine+1, t);
 	}
+}
+
+void document::search(string searchFor) {
+
+	int startLine = pointLine;
+	int startChar = pointChar;
+
+	//start from pointLine, pointChar and work forwards
+	while (pointLine<line.size()) {
+		int p = line[pointLine].find(searchFor, pointChar);
+		if (p > pointChar) {
+			pointChar=p;
+			return;
+		}
+		else
+		{
+			pointChar=0;
+			pointLine++;
+		}
+	}
+
 }
 
 //Return the entire document as a string
