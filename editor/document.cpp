@@ -21,6 +21,13 @@ document::document(void)
 	pointLine = 0;
 	//The character within the current line that the point is at is initialised
 	pointChar = 0;
+
+	marking=false;
+	markStartLine = pointLine;
+	markStartChar = pointChar;
+	markEndLine = pointLine;
+	markEndChar = pointChar;
+
 }
 
 //parseInput function decides what command(s) should be executed from the current line of input and executes the command(s)
@@ -191,13 +198,30 @@ void document::parseInput(string s)
 						if (pointLine==markEndLine && pointChar==markEndChar) {
 							pointChar++;
 							//Check whether point has moved past the end of the line
-							if(pointChar > line[pointLine].length()) {
-								//Move point to the start of the next line
-								pointLine++;
-								pointChar=0;
+							if (pointLine < line.size()) {
+								if (pointChar > line[pointLine].length()) {
+									//Move point to the start of the next line
+									pointLine++;
+									pointChar=0;
+								}
 							}
+
+							if (pointLine > line.size()) {
+								pointLine=line.size();
+							}
+ 
+							if (pointLine < line.size()) {
+								if (pointChar > line[pointLine].length()) {
+									pointChar = line[pointLine].length();
+								}
+							}
+							else {
+								pointChar = 0;
+							}
+
 							markEndLine = pointLine;
 							markEndChar = pointChar;
+
 						}
 					}
 					else
@@ -206,11 +230,27 @@ void document::parseInput(string s)
 						markStartChar = pointChar;
 						pointChar++;
 						//Check whether point has moved past the end of the line
-						if(pointChar > line[pointLine].length()) {
-							//Move point to the start of the next line
-							pointLine++;
-							pointChar=0;
+						if (pointLine < line.size()) {
+							if (pointChar > line[pointLine].length()) {
+								//Move point to the start of the next line
+								pointLine++;
+								pointChar=0;
+							}
 						}
+
+						if (pointLine > line.size()) {
+							pointLine=line.size();
+						}
+
+						if (pointLine < line.size()) {
+							if (pointChar > line[pointLine].length()) {
+								pointChar = line[pointLine].length();
+							}
+						}
+						else {
+							pointChar = 0;
+						}
+
 						markEndLine = pointLine;
 						markEndChar = pointChar;
 
@@ -218,11 +258,11 @@ void document::parseInput(string s)
 					marking=true;
 				}
 
-				if (c=="c" && marking) {
+				if (c=="c" && marking && !(markStartLine==markEndLine && markStartChar==markEndChar)) {
 					int i = markStartLine;
 					int j = markStartChar;
 					clipboard.clear();
-					while (i <= markEndLine) {
+					while (i <= markEndLine && i < line.size()) {
 						int k = line[i].length();
 						if (i==markEndLine) k = markEndChar;
 						clipboard.insert(clipboard.end(), line[i].substr(j,k-j));
@@ -231,11 +271,12 @@ void document::parseInput(string s)
 					}
 				}
 
-				if (c=="x" && marking) {
+				if (c=="x" && marking && !(markStartLine==markEndLine && markStartChar==markEndChar)) {
 					int i = markStartLine;
 					int j = markStartChar;
+
 					clipboard.clear();
-					while (i <= markEndLine) {
+					while (i <= markEndLine  && i < line.size()) {
 						int k = line[i].length();
 						if (i==markEndLine) k = markEndChar;
 						if (j>0&&k>0) {
@@ -244,15 +285,16 @@ void document::parseInput(string s)
 								line.erase(line.begin()+i);
 							}
 							else if (i==markStartLine) {
-								line[i] = line[i].substr(0,j);
+								line[i] = line[i].substr(0,j) + line[i].substr(k,line[i].length()-k);
 							}
 							else if (i==markEndLine) {
-								line[i] = line[i].substr(k,line[i].length());
+								line[i] = line[i].substr(k,line[i].length()-k);
 							}
 						}
 						i++;
 						j=0;
 					}
+
 					pointLine = markStartLine;
 					pointChar = markStartChar;
 				}
