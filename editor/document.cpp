@@ -206,18 +206,18 @@ void document::parseInput(string s)
 								}
 							}
 
-							if (pointLine > line.size()) {
-								pointLine=line.size();
-							}
+							//if (pointLine > line.size()) {
+							//	pointLine=line.size();
+							//}
  
-							if (pointLine < line.size()) {
-								if (pointChar > line[pointLine].length()) {
-									pointChar = line[pointLine].length();
-								}
-							}
-							else {
-								pointChar = 0;
-							}
+							//if (pointLine < line.size()) {
+							//	if (pointChar > line[pointLine].length()) {
+							//		pointChar = line[pointLine].length();
+							//	}
+							//}
+							//else {
+							//	pointChar = 0;
+							//}
 
 							markEndLine = pointLine;
 							markEndChar = pointChar;
@@ -238,18 +238,18 @@ void document::parseInput(string s)
 							}
 						}
 
-						if (pointLine > line.size()) {
-							pointLine=line.size();
-						}
+						//if (pointLine > line.size()) {
+						//	pointLine=line.size();
+						//}
 
-						if (pointLine < line.size()) {
-							if (pointChar > line[pointLine].length()) {
-								pointChar = line[pointLine].length();
-							}
-						}
-						else {
-							pointChar = 0;
-						}
+						//if (pointLine < line.size()) {
+						//	if (pointChar > line[pointLine].length()) {
+						//		pointChar = line[pointLine].length();
+						//	}
+						//}
+						//else {
+						//	pointChar = 0;
+						//}
 
 						markEndLine = pointLine;
 						markEndChar = pointChar;
@@ -262,10 +262,19 @@ void document::parseInput(string s)
 					int i = markStartLine;
 					int j = markStartChar;
 					clipboard.clear();
-					while (i <= markEndLine && i < line.size()) {
-						int k = line[i].length();
-						if (i==markEndLine) k = markEndChar;
-						clipboard.insert(clipboard.end(), line[i].substr(j,k-j));
+					while (i <= markEndLine && i <= line.size()) {
+						int k = 0;
+						string t;
+						if (i < line.size()) {
+							k = line[i].length();
+							if (i==markEndLine) k = markEndChar;
+							t = line[i].substr(j,k-j);
+						}
+						else {
+							k = 0;
+							t = "";
+						}
+						clipboard.insert(clipboard.end(), t);
 						i++;
 						j=0;
 					}
@@ -303,6 +312,11 @@ void document::parseInput(string s)
 					int i = 0;
 					int clipLine=pointLine;
 					int clipChar=pointChar;
+
+					if (clipLine >= line.size()) {
+						clipLine=line.size()-1;						
+					}
+
 					while(i < clipboard.size()) {
 						if (clipboard[i].length() > 0) {
 							clipChar = insertString(clipLine, clipChar, clipboard[i]);
