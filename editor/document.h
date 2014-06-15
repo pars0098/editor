@@ -22,5 +22,12 @@ private:
 	int pointChar; //store the current point character position in the current line
 	vector<string> line; //a vector of strings for each individual line
 	vector<string> buffer; //a vector of strings representing the buffer
-
+	vector<string> clipboard; //a vector of strings representing the clipboard
+	int markStart; //store the position of the mark start;
+	int markEnd; //store the position of the mark end;
+	int markStartLine; //store the position of the mark start;
+	int markEndLine; //store the position of the mark end;
+	int markStartChar; //store the position of the mark start;
+	int markEndChar; //store the position of the mark end;
+	bool marking; //the current document is being marked
 };

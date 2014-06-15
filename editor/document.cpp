@@ -185,6 +185,100 @@ void document::parseInput(string s)
 						}
 					}
 				}
+
+				if(c=="m") {
+					if (marking) {
+						if (pointLine==markEndLine && pointChar==markEndChar) {
+							pointChar++;
+							//Check whether point has moved past the end of the line
+							if(pointChar > line[pointLine].length()) {
+								//Move point to the start of the next line
+								pointLine++;
+								pointChar=0;
+							}
+							markEndLine = pointLine;
+							markEndChar = pointChar;
+						}
+					}
+					else
+					{
+						markStartLine = pointLine;
+						markStartChar = pointChar;
+						pointChar++;
+						//Check whether point has moved past the end of the line
+						if(pointChar > line[pointLine].length()) {
+							//Move point to the start of the next line
+							pointLine++;
+							pointChar=0;
+						}
+						markEndLine = pointLine;
+						markEndChar = pointChar;
+
+					}
+					marking=true;
+				}
+
+				if (c=="c" && marking) {
+					int i = markStartLine;
+					int j = markStartChar;
+					clipboard.clear();
+					while (i <= markEndLine) {
+						int k = line[i].length();
+						if (i==markEndLine) k = markEndChar;
+						clipboard.insert(clipboard.end(), line[i].substr(j,k-j));
+						i++;
+						j=0;
+					}
+				}
+
+				if (c=="x" && marking) {
+					int i = markStartLine;
+					int j = markStartChar;
+					clipboard.clear();
+					while (i <= markEndLine) {
+						int k = line[i].length();
+						if (i==markEndLine) k = markEndChar;
+						if (j>0&&k>0) {
+							clipboard.insert(clipboard.end(), line[i].substr(j,k-j));
+							if (i!=markStartLine&&i!=markEndLine) {
+								line.erase(line.begin()+i);
+							}
+							else if (i==markStartLine) {
+								line[i] = line[i].substr(0,j);
+							}
+							else if (i==markEndLine) {
+								line[i] = line[i].substr(k,line[i].length());
+							}
+						}
+						i++;
+						j=0;
+					}
+					pointLine = markStartLine;
+					pointChar = markStartChar;
+				}
+
+				if (c=="v") {
+					int i = 0;
+					int clipLine=pointLine;
+					int clipChar=pointChar;
+					while(i < clipboard.size()) {
+						if (clipboard[i].length() > 0) {
+							clipChar = insertString(clipLine, clipChar, clipboard[i]);
+						}
+						i++;
+						if (i < clipboard.size()) {
+							splitLine(clipLine, clipChar);
+						}
+						pointLine=clipLine;
+						pointChar=clipChar;
+						clipLine++;
+						clipChar=0;
+					}
+				}
+
+				if (c!="m") {
+					marking=false;
+				}
 			}
 
 			if(c=="i") {
@@ -282,120 +376,6 @@ void document::parseInput(string s)
 
 				s.erase(0, s.length());
 
-			//	//rewrite to do search loop in here
-			//	//store search string and restart search from start of the string when it fails
-
-			//	string t = s;
-
-			//	int startLine = pointLine;
-			//	int startPoint = pointChar;
-
-			//	bool loop=false;
-
-			//	bool foundFirst=false;
-			//	bool hasNext = false;
-			//	bool foundNext=false;
-
-			//	int foundLine = pointLine;
-			//	int foundChar = pointChar;
-
-			//	size_t p;
-			//	while ((!loop&&pointLine<line.size())||(loop&&pointLine<=startLine)) {
-
-			//		int fromLine = startLine;
-			//		int fromChar = startChar;
-
-			//		while ((p = s.find("\\n",0)) >=0 || s.length() > 0) {
-			//			
-			//			string x;
-
-			//			if (p >= 0) {
-			//				x = s.substr(0, p);
-			//				s.erase(0, p + 2);
-			//				hasNext = true;
-			//			}
-			//			else
-			//			{
-			//				x = s;
-			//				s.erase(0, s.length());
-			//				hasNext = false;
-			//			}
-
-			//			if (!foundFirst) {
-
-			//				if (hasNext) {
-			//					foundFirst = searchInLine(x, pointLine, pointChar, true, false);
-			//				}
-			//				else
-			//				{
-			//					foundFirst = searchInLine(x, pointLine, pointChar, false, false);
-			//				}
-
-			//				if (foundFirst) {
-			//					foundLine = pointLine;
-			//					foundChar = pointChar;
-			//				}
-
-			//			}
-			//			else if (!foundNext) {
-			//				if (hasNext) {
-			//					foundNext = searchInLine(x, pointLine, 0, true, true);
-			//				}
-			//				else
-			//				{
-			//					foundNext = searchInLine(x, pointLine, 0, true, false);
-			//				}
-			//			}
-
-			//			if (foundFirst&&foundNext) {
-			//				pointLine = foundLine;
-			//				pointChar = foundChar;
-			//			}
-			//			else {
-			//				foundFirst=false;
-			//				foundNext=false;
-			//				foundLine = startLine;
-			//				foundChar = startChar;
-			//			}
-
-			//		}
-
-			//		pointLine++;
-			//		if (pointLine>=line.size()) {
-			//			pointLine=0;
-			//			pointChar=0;
-			//			loop=true;
-			//		}
-			//	}
-			//	
-
-			//	bool f = false;
-			//	int firstFoundAtLine;
-			//	int firstFoundAtChar;
-
-			//	if ((p = s.find("\\n",0)) < s.length()) {
-			//		string x;
-			//		x = s.substr(0, p);
-			//		f = searchEndOfLine(x);
-			//		s.erase(0, p + 2);
-			//		while (((p = s.find("\\n",0)) < s.length())&&f) {
-			//			string x;
-			//			x = s.substr(0, p);
-			//			f = searchEntireLine(x, pointLine);
-			//			s.erase(0, p + 2);
-			//		}
-			//		if (f) {
-			//			string x;
-			//			x = s.substr(0, p);
-			//			f = searchStartOfLine(x);
-			//			s.erase(0, p + 2);
-			//		}
-			//	}
-			//	else if (s.length() > 0) {
-			//		search(s);
-			//		s.erase(0,s.length());
-
-			//	}
 			}
 		}
 	}
